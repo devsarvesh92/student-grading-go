@@ -36,6 +36,8 @@ func parseCSV(filePath string) []student {
 		fmt.Printf("Error %v while reading file %v \n", err, file)
 	}
 
+	defer file.Close()
+
 	csv := csv.NewReader(file)
 
 	records, err := csv.ReadAll()
@@ -74,14 +76,15 @@ func calculateGrade(students []student) []studentStat {
 	allstudentStats := make([]studentStat, 0, len(students))
 
 	var getGrade = func(finalScore float32) Grade {
-		if finalScore < 35 {
-			return F
-		} else if finalScore >= 35 && finalScore < 50 {
-			return C
-		} else if finalScore >= 50 && finalScore < 70 {
-			return B
-		} else {
+		switch {
+		case finalScore >= 70:
 			return A
+		case finalScore >= 50:
+			return B
+		case finalScore >= 35:
+			return C
+		default:
+			return F
 		}
 	}
 
